@@ -47,67 +47,54 @@ def main():
         detected_markers = detect_aruco_markers(frame, arucoDict, intrinsic_camera, distortion)
 
         # Draw detected markers
-        # if len(detected_markers) > 0:
-        #     for marker_id, marker_corners in detected_markers:
-        #         # Convert corner coordinates to integers
-        #         marker_corners_int = np.int32(marker_corners)
-        #         # Draw marker ID and corner coordinates on the frame
-        #         cv2.putText(frame, f"ID: {marker_id}", (marker_corners_int[0][0], marker_corners_int[0][1] - 10),
-        #                     cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-        #         cv2.putText(frame, f"({marker_corners_int[0][0]}, {marker_corners_int[0][1]})",
-        #                     (marker_corners_int[0][0], marker_corners_int[0][1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-        #                     (0, 0, 0), 2)
-        #         # Draw marker corners
-        #         for corner in marker_corners_int:
-        #             cv2.circle(frame, (corner[0], corner[1]), 3, (0, 0, 255), -1)
-
-        # Draw detected markers
-        new_polygon =[]
+        new_polygon = []
         if len(detected_markers) > 0:
+            # Sort detected markers by their IDs
+            detected_markers.sort(key=lambda x: x[0])
             for marker_id, marker_corners in detected_markers:
-                # Convert corner coordinates to NumPy array
-                marker_corners_np = np.array(marker_corners)
-
-                print(marker_corners_np)
+                # Convert corner coordinates to integers
+                marker_corners_int = np.int32(marker_corners)
+                # Draw marker ID and corner coordinates on the frame
+                cv2.putText(frame, f"ID: {marker_id}", (marker_corners_int[0][0], marker_corners_int[0][1] - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                cv2.putText(frame, f"({marker_corners_int[0][0]}, {marker_corners_int[0][1]})",
+                            (marker_corners_int[0][0], marker_corners_int[0][1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                            (0, 0, 0), 2)
                 # Determine specific corners based on ArUco marker ID
                 if marker_id == 1:
                     # Bottom left corner
-                    corner = marker_corners_np[0]
+                    corner = marker_corners_int[3]
+                    new_polygon.insert(1,corner)
                 elif marker_id == 2:
                     # Top left corner
-                    corner = marker_corners_np[1]
+                    corner = marker_corners_int[0]
+                    new_polygon.insert(2,corner)
                 elif marker_id == 3:
                     # Bottom right corner
-                    corner = marker_corners_np[3]
+                    corner = marker_corners_int[1]
+                    new_polygon.insert(3,corner)
                 elif marker_id == 4:
                     # Top right corner
-                    corner = marker_corners_np[2]
+                    corner = marker_corners_int[2]
+                    new_polygon.insert(0,corner)
                 else:
                     continue  # Skip this marker if ID is not 1, 2, 3, or 4
 
-                new_polygon.append(corner)
+        # Check if all corners have been found before continuing
+        if len(new_polygon) == 4:
+            # Save ZONE_POLYGON to a file
+            ZONE_POLYGON = np.array(new_polygon)
+            #np.savetxt('zone_polygon.txt', ZONE_POLYGON.astype(int), fmt='%d')
 
-                # Display the detected markers and specific corners
-                cv2.polylines(frame, [np.int32(marker_corners)], True, (0, 255, 0), 2)
-                cv2.circle(frame, (int(corner[0]), int(corner[1])), 5, (0, 0, 255), -1)
+            # Draw the polygon on the frame
+            cv2.polylines(frame, [np.int32(ZONE_POLYGON)], True, (0, 255, 0), 2)
+            print(new_polygon)
+            return ZONE_POLYGON
 
-        # Reverse the order of the last two elements in new_polygon
-        if len(new_polygon) >= 2:
-            new_polygon[-2:] = new_polygon[-2:][::-1]
-
-        ZONE_POLYGON = np.array(new_polygon)
-        # Save ZONE_POLYGON to a file
-        np.savetxt('zone_polygon.txt', ZONE_POLYGON.astype(int), fmt='%d')
-
-        cv2.polylines(frame, [np.int32(ZONE_POLYGON)], True, (0, 255, 0), 2)
-
-        print(new_polygon)
-
-        cv2.imshow('Detected Arucos', frame)
+        #cv2.imshow('Detected Arucos', frame)
 
         # Save the frame and exit
-        cv2.imwrite('webcam_frame.jpg', frame)
-
+        #cv2.imwrite('webcam_frame.jpg', frame)
 
         #if cv2.waitKey(1) & 0xFF == ord('q'):
         break
@@ -115,6 +102,7 @@ def main():
     # Release the webcam
     cap.release()
     cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()
