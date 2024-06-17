@@ -1,0 +1,95 @@
+
+import cv2
+import numpy as np
+import requests
+
+# Camera calibration parameters
+intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
+distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
+
+def robotToCube(center_coordinates, frame):
+
+    # Detect Robot
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
+    parameters = cv2.aruco.DetectorParameters_create()
+
+    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters,
+                                              cameraMatrix=intrinsic_camera,
+                                              distCoeff=distortion)
+
+    robot_detected = False
+    robot_index = -1
+    if len(corners) > 0:
+        for i in range(len(ids)):
+            if ids[i] == 0:  # Recherche uniquement le marqueur avec l'ID 5
+                robot_detected = True
+                robot_index = i
+                break
+
+    if robot_detected:
+        # Estimer la pose du marqueur du robot
+        rvec_robot, tvec_robot, _ = cv2.aruco.estimatePoseSingleMarkers(corners[robot_index], 0.02,
+                                                                        intrinsic_camera,
+                                                                        distortion)
+
+        # Obtenir les centres du marqueur du robot et de l'objet dans l'image
+        robot_center = np.array(tuple(map(int, corners[robot_index].mean(axis=1)[0])))
+        object_center = np.array(tuple(map(int, center_coordinates)))
+
+        # Calculate the direction vector from the robot marker to the object marker
+        direction_vector = object_center - robot_center
+
+        norm_direction_vector = direction_vector.flatten() / np.linalg.norm(direction_vector)
+
+        # Calculate the rotation matrix for the robot
+        rotation_matrix, _ = cv2.Rodrigues(rvec_robot[0])
+
+        # Calculate the robot's forward vector (face avant)
+        robot_forward_vector = np.array([[1, 0, 0]])
+
+        # Transform the robot's forward vector to the world coordinate system
+        robot_forward_vector_world = np.dot(rotation_matrix, robot_forward_vector.T)
+
+        # Normalize the robot's forward vector
+        norm_robot_forward_vector = robot_forward_vector_world.flatten() / np.linalg.norm(
+            robot_forward_vector_world)
+
+        # Calculate the signed angle between the robot's forward vector and the direction vector
+        signed_angle_rad = np.arctan2(norm_direction_vector[1], norm_direction_vector[0]) - np.arctan2(
+            norm_robot_forward_vector[1], norm_robot_forward_vector[0])
+        signed_angle_deg = np.degrees(np.arctan2(np.sin(signed_angle_rad), np.cos(signed_angle_rad)))
+
+        # Calculate the distance between the robot and the object
+        distance = np.linalg.norm(direction_vector)
+
+        print("Signed Angle: {} degrees".format(signed_angle_deg))
+
+        # Dessiner une ligne entre les centres du marqueur du robot et de l'objet
+        cv2.line(frame, robot_center, object_center, (0, 255, 0), 2)
+
+        # Dessiner un cercle au centre du marqueur du robot
+        cv2.circle(frame, robot_center, 5, (0, 0, 255), -1)
+
+        # Dessiner un cercle au centre de l'objet
+        cv2.circle(frame, object_center, 5, (255, 0, 0), -1)
+
+        # Dessiner le marqueur détecté et l'axe du marqueur du robot sur l'image
+        cv2.aruco.drawDetectedMarkers(frame, corners)
+        cv2.aruco.drawAxis(frame, intrinsic_camera, distortion, rvec_robot, tvec_robot, 0.01)
+
+        #send_data(signed_angle_deg, distance)
+
+    cv2.imshow("Yolov8", frame)
+
+
+
+
+def send_data(angle, distance):
+
+    #url = 'http://172.20.10.2/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
+    url = 'http://192.168.1.17/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
+
+    # Send the distance and angle values to the ESP8266 server
+    response = requests.get(url, params={'distance': distance, 'angle': angle})
+    print(response.text)  # Print the response from the ESP8266 server
