@@ -79,3 +79,43 @@ def cube_detection_inZone(ZONE_POLYGON, frame):
     #cv2.destroyAllWindows()
     return center_coordinates
 
+
+def get_boxes(results):
+    boxes = []
+    for result in results.boxes.xyxy:
+        x_min, y_min, x_max, y_max = result[:4]
+        boxes.append((x_min, y_min, x_max, y_max))
+    return boxes
+
+def cube_detection(frame):
+
+    model = YOLO("Model/best_2.pt")
+
+    # Type of annotator
+    box_annotator = sv.BoundingBoxAnnotator()
+    label_annotator = sv.LabelAnnotator()
+
+    results = model(frame, agnostic_nms=True)[0]
+    detections = sv.Detections.from_ultralytics(results)
+    detections = detections[(detections.confidence > 0.9)]
+
+    labels = [
+        f"{results.names[class_id]}"
+        for class_id in detections.class_id
+    ]
+
+    annotated_frame = box_annotator.annotate(
+        scene=frame,
+        detections=detections,
+    )
+
+    annotated_frame = label_annotator.annotate(
+        annotated_frame,
+        detections=detections,
+        labels=labels
+    )
+
+    center_coordinates = get_cube_center(results)
+    box_coordinates = get_boxes(results)
+
+    return center_coordinates, box_coordinates, annotated_frame

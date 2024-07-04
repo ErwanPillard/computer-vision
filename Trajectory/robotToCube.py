@@ -7,83 +7,103 @@ import requests
 intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
 distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
 
-def robotToCube(center_coordinates, frame):
+def robotToTarget(frame, start, goal, directions):
+    current_position = start
 
-    # Detect Robot
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
-    parameters = cv2.aruco.DetectorParameters_create()
+    for target in directions:
+        move_robot_to_target(frame, current_position, target)
+        current_position = target
 
-    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters,
-                                              cameraMatrix=intrinsic_camera,
-                                              distCoeff=distortion)
-
-    robot_detected = False
-    robot_index = -1
-    if len(corners) > 0:
-        for i in range(len(ids)):
-            if ids[i] == 0:  # Recherche uniquement le marqueur avec l'ID 5
-                robot_detected = True
-                robot_index = i
-                break
-
-    if robot_detected:
-        # Estimer la pose du marqueur du robot
-        rvec_robot, tvec_robot, _ = cv2.aruco.estimatePoseSingleMarkers(corners[robot_index], 0.02,
-                                                                        intrinsic_camera,
-                                                                        distortion)
-
-        # Obtenir les centres du marqueur du robot et de l'objet dans l'image
-        robot_center = np.array(tuple(map(int, corners[robot_index].mean(axis=1)[0])))
-        object_center = np.array(tuple(map(int, center_coordinates)))
-
-        # Calculate the direction vector from the robot marker to the object marker
-        direction_vector = object_center - robot_center
-
-        norm_direction_vector = direction_vector.flatten() / np.linalg.norm(direction_vector)
-
-        # Calculate the rotation matrix for the robot
-        rotation_matrix, _ = cv2.Rodrigues(rvec_robot[0])
-
-        # Calculate the robot's forward vector (face avant)
-        robot_forward_vector = np.array([[1, 0, 0]])
-
-        # Transform the robot's forward vector to the world coordinate system
-        robot_forward_vector_world = np.dot(rotation_matrix, robot_forward_vector.T)
-
-        # Normalize the robot's forward vector
-        norm_robot_forward_vector = robot_forward_vector_world.flatten() / np.linalg.norm(
-            robot_forward_vector_world)
-
-        # Calculate the signed angle between the robot's forward vector and the direction vector
-        signed_angle_rad = np.arctan2(norm_direction_vector[1], norm_direction_vector[0]) - np.arctan2(
-            norm_robot_forward_vector[1], norm_robot_forward_vector[0])
-        signed_angle_deg = np.degrees(np.arctan2(np.sin(signed_angle_rad), np.cos(signed_angle_rad)))
-
-        # Calculate the distance between the robot and the object
-        distance = np.linalg.norm(direction_vector)
-
-        print("Signed Angle: {} degrees".format(signed_angle_deg))
-
-        # Dessiner une ligne entre les centres du marqueur du robot et de l'objet
-        cv2.line(frame, robot_center, object_center, (0, 255, 0), 2)
-
-        # Dessiner un cercle au centre du marqueur du robot
-        cv2.circle(frame, robot_center, 5, (0, 0, 255), -1)
-
-        # Dessiner un cercle au centre de l'objet
-        cv2.circle(frame, object_center, 5, (255, 0, 0), -1)
-
-        # Dessiner le marqueur détecté et l'axe du marqueur du robot sur l'image
-        cv2.aruco.drawDetectedMarkers(frame, corners)
-        cv2.aruco.drawAxis(frame, intrinsic_camera, distortion, rvec_robot, tvec_robot, 0.01)
-
-        #send_data(signed_angle_deg, distance)
-
-    cv2.imshow("Yolov8", frame)
+    move_robot_to_target(frame, current_position, goal)
 
 
+def move_robot_to_target(frame, start, target):
+    reached_target = False
 
+    while not reached_target:
+        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
+        parameters = cv2.aruco.DetectorParameters_create()
+
+        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters,
+                                                  cameraMatrix=intrinsic_camera,
+                                                  distCoeff=distortion)
+
+        robot_detected = False
+        robot_index = -1
+        if len(corners) > 0:
+            for i in range(len(ids)):
+                if ids[i] == 0:  # Recherche uniquement le marqueur avec l'ID 5
+                    robot_detected = True
+                    robot_index = i
+                    break
+
+        if robot_detected:
+            # Estimer la pose du marqueur du robot
+            rvec_robot, tvec_robot, _ = cv2.aruco.estimatePoseSingleMarkers(corners[robot_index], 0.02,
+                                                                            intrinsic_camera,
+                                                                            distortion)
+
+            # Obtenir les centres du marqueur du robot et de l'objet dans l'image
+            robot_center = np.array(tuple(map(int, corners[robot_index].mean(axis=1)[0])))
+            object_center = np.array(target)
+
+            # Calculer le vecteur de direction du marqueur du robot au marqueur de l'objet
+            direction_vector = object_center - robot_center
+
+            norm_direction_vector = direction_vector.flatten() / np.linalg.norm(direction_vector)
+
+            # Calculer la matrice de rotation pour le robot
+            rotation_matrix, _ = cv2.Rodrigues(rvec_robot[0])
+
+            # Calculer le vecteur avant du robot (face avant)
+            robot_forward_vector = np.array([[1, 0, 0]])
+
+            # Transformer le vecteur avant du robot dans le système de coordonnées du monde
+            robot_forward_vector_world = np.dot(rotation_matrix, robot_forward_vector.T)
+
+            # Normaliser le vecteur avant du robot
+            norm_robot_forward_vector = robot_forward_vector_world.flatten() / np.linalg.norm(
+                robot_forward_vector_world)
+
+            # Calculer l'angle signé entre le vecteur avant du robot et le vecteur de direction
+            signed_angle_rad = np.arctan2(norm_direction_vector[1], norm_direction_vector[0]) - np.arctan2(
+                norm_robot_forward_vector[1], norm_robot_forward_vector[0])
+            signed_angle_deg = np.degrees(np.arctan2(np.sin(signed_angle_rad), np.cos(signed_angle_rad)))
+
+            # Calculer la distance entre le robot et l'objet
+            distance = np.linalg.norm(direction_vector)
+
+            print("Signed Angle: {} degrees".format(signed_angle_deg))
+            print("Distance to target: {} units".format(distance))
+
+            # Dessiner une ligne entre les centres du marqueur du robot et de l'objet
+            cv2.line(frame, robot_center, object_center, (0, 255, 0), 2)
+
+            # Dessiner un cercle au centre du marqueur du robot
+            cv2.circle(frame, robot_center, 5, (0, 0, 255), -1)
+
+            # Dessiner un cercle au centre de l'objet
+            cv2.circle(frame, object_center, 5, (255, 0, 0), -1)
+
+            # Dessiner le marqueur détecté et l'axe du marqueur du robot sur l'image
+            cv2.aruco.drawDetectedMarkers(frame, corners)
+            cv2.aruco.drawAxis(frame, intrinsic_camera, distortion, rvec_robot, tvec_robot, 0.01)
+
+            # Envoyer les données pour contrôler le robot (exemple : rotation et distance)
+            #send_data(signed_angle_deg, distance)
+
+            # Mettre à jour la position actuelle du robot
+            current_position = robot_center
+
+            # Vérifier si le robot a atteint la cible
+            if distance < 10:  # Seuil de tolérance
+                reached_target = True
+
+        # Afficher l'image mise à jour
+        cv2.imshow("Yolov8", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
 def send_data(angle, distance):
 
