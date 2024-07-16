@@ -2,8 +2,8 @@
 #include "ESP8266WebServer.h"
 
 // Remplacez par les informations de votre réseau WiFi
-const char* ssid = "Wifi-Name";
-const char* password = "passeword";
+const char* ssid = "YOUR-WIFI";
+const char* password = "YOUR-PASSWORD";
 
 // Crée un serveur web sur le port 80
 ESP8266WebServer server(80);
@@ -11,14 +11,9 @@ ESP8266WebServer server(80);
 // Variables pour stocker les données reçues
 String angle;
 String distance;
-int vitesse_r = 1023; // Vitesse initiale (maximum)
-int vitesse = 1023; // Vitesse initiale (maximum)
+int vitesse_motor_1 = 160; //moteur différent il ne vont pas a la même vitesse avec une meme tension
+int vitesse_motor_2 = 125;
 
-// Configuration des broches pour les moteurs
-const int motor1_pin1 = 5;
-const int motor1_pin2 = 0;
-const int motor2_pin1 = 4;
-const int motor2_pin2 = 2;
 
 const int motor1_pwm = 5;
 const int motor1_dir = 0;
@@ -30,10 +25,10 @@ void setup() {
   Serial.begin(115200);
 
   // Initialisation des broches des moteurs en sortie
-  pinMode(motor1_pin1, OUTPUT);
-  pinMode(motor1_pin2, OUTPUT);
-  pinMode(motor2_pin1, OUTPUT);
-  pinMode(motor2_pin2, OUTPUT);
+  pinMode(motor1_pwm, OUTPUT);
+  pinMode(motor1_dir, OUTPUT);
+  pinMode(motor2_pwm, OUTPUT);
+  pinMode(motor2_dir, OUTPUT);
 
   // Connexion au réseau WiFi
   WiFi.begin(ssid, password);
@@ -84,11 +79,9 @@ void loop() {
 
 // Fonction pour gérer les requêtes à /data
 void handleData() {
-  if (server.hasArg("distance") && server.hasArg("angle") && server.hasArg("vitesse_r") && server.hasArg("vitesse")) {
+  if (server.hasArg("distance") && server.hasArg("angle")) {
     distance = server.arg("distance");
     angle = server.arg("angle");
-    vitesse_r = server.arg("vitesse_r").toInt();
-    vitesse = server.arg("vitesse").toInt();
 
     // Affiche les données reçues sur le moniteur série
     //Serial.print("Received distance: ");
@@ -106,37 +99,36 @@ void handleData() {
 
 // Fonctions de contrôle des moteurs
 void avancer() {
-  analogWrite(motor1_pwm, vitesse);
+  analogWrite(motor1_pwm, vitesse_motor_1);
   digitalWrite(motor1_dir, HIGH);
-  analogWrite(motor2_pwm, vitesse);
+  analogWrite(motor2_pwm, vitesse_motor_2);
   digitalWrite(motor2_dir, HIGH);
 }
 
 void reculer() {
-  digitalWrite(motor1_pin1, HIGH);
-  digitalWrite(motor1_pin2, HIGH);
-  digitalWrite(motor2_pin1, HIGH);
-  digitalWrite(motor2_pin2, HIGH);
+  analogWrite(motor1_pwm, vitesse_motor_1);
+  digitalWrite(motor1_dir, LOW);
+  analogWrite(motor2_pwm, vitesse_motor_2);
+  digitalWrite(motor2_dir, LOW);
 }
 
-void tournerGauche(float angle) {
-  int adjusted_speed = map(abs(angle), 15, 180, 100, vitesse_r); // Adjust speed based on angle
-  analogWrite(motor1_pwm, adjusted_speed);
+void tournerGauche() {
+  analogWrite(motor1_pwm, vitesse_motor_1);
   digitalWrite(motor1_dir, LOW);
-  analogWrite(motor2_pwm, adjusted_speed);
+  analogWrite(motor2_pwm, vitesse_motor_2);
   digitalWrite(motor2_dir, HIGH);
 }
 
 void tournerDroite() {
-  digitalWrite(motor1_pin1, HIGH);
-  digitalWrite(motor1_pin2, HIGH);
-  digitalWrite(motor2_pin1, HIGH);
-  digitalWrite(motor2_pin2, LOW);
+  analogWrite(motor1_pwm, vitesse_motor_1);
+  digitalWrite(motor1_dir, HIGH);
+  analogWrite(motor2_pwm, vitesse_motor_2);
+  digitalWrite(motor2_dir, LOW);
 }
 
 void stop() {
-  digitalWrite(motor1_pin1, LOW);
-  digitalWrite(motor1_pin2, LOW);
-  digitalWrite(motor2_pin1, LOW);
-  digitalWrite(motor2_pin2, LOW);
+  analogWrite(motor1_pwm, LOW);
+  digitalWrite(motor1_dir, LOW);
+  analogWrite(motor2_pwm, LOW);
+  digitalWrite(motor2_dir, LOW);
 }

@@ -54,6 +54,8 @@ Ensure your camera is properly calibrated to minimize distortions and improve th
 
 7. Launch main.py
 
+Remark : If you use a macbook, to use your iphone as a webcam change for this : cap = cv2.VideoCapture(1)
+
 # Training the YOLOv8 Model with Google Colaboratory
 
 ## 1. Retrieving data for model training

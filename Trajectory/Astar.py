@@ -2,19 +2,19 @@ import networkx as nx
 import numpy as np
 
 def astar(grid, start, goal):
-    # Création d'un graphe à partir de la grille
+    # Create a graph from the grid
     G = nx.grid_2d_graph(20, 30)
 
-    # Ajout des arêtes en tenant compte des cases libres
+    # Remove edges corresponding to obstacles in the grid
     for row in range(20):
         for col in range(30):
             if grid[row, col] == 1:
                 G.remove_node((row, col))
 
-    # Calcul du chemin le plus court avec A*
+    # Find the shortest path using A*
     path = nx.astar_path(G, start, goal)
 
-    # Détection des changements de direction (angles droits)
+    # Detect direction changes (right angles) in the path
     directions = []
 
     for i in range(1, len(path) - 1):
@@ -22,7 +22,7 @@ def astar(grid, start, goal):
         curr_node = path[i]
         next_node = path[i + 1]
 
-        # Calcul de la direction entre les points consécutifs
+        # Calculate direction between consecutive points
         direction1 = (curr_node[0] - prev_node[0], curr_node[1] - prev_node[1])
         direction2 = (next_node[0] - curr_node[0], next_node[1] - curr_node[1])
 

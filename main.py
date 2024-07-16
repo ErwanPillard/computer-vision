@@ -11,78 +11,73 @@ image_height = 1000
 
 def main(image):
 
-    # Redimensionner l'image pour une résolution plus gérable (par exemple, 1024x768)
-    #scale_percent = 80  # pourcentage de réduction
-    #width = int(image.shape[1] * scale_percent / 100)
-    #height = int(image.shape[0] * scale_percent / 100)
-    #dim = (width, height)
+    # Resize the image for a more manageable resolution (e.g., 1024x768)
+    # scale_percent = 80  # percentage of reduction
+    # width = int(image.shape[1] * scale_percent / 100)
+    # height = int(image.shape[0] * scale_percent / 100)
+    # dim = (width, height)
 
-    # Redimensionner l'image
-    #resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    # Resize the image
+    # resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
-    # Detection de la map
+    # Map detection
     map = mapDetection(image)
 
-    #Sélection de la region of interest
+    # Select the region of interest
     roi = get_roi(map, image, image_width, image_height)
 
-    # Detection Objet
+    # Object detection
     center_cube, box_coordinates, roi = cube_detection(roi)
 
-    # Création matrices 30x20
+    # Create 30x20 grids/matrices
     grid_rows, grid_cols = 20, 30
     cell_width = image_width // grid_cols
     cell_height = image_height // grid_rows
 
-    # Detection Robot
+    # Robot detection
     robot_center, roi = detect_robot_center(roi)
 
     cv2.imshow('Gridded ROI', roi)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    #Recuération de la map modelisé en fonction des object/obstacles presents
+    # Retrieve the modeled map based on detected objects/obstacles
     grid_location, grid_obstacle, cube_row, cube_col, robot_row, robot_col = matrice(box_coordinates, center_cube, robot_center, grid_rows, grid_cols, cell_width, cell_height)
 
     path, directions = astar(grid_location, (robot_row, robot_col), (cube_row, cube_col))
 
     grid_location[cube_row, cube_col] = 1
-    grid_location[robot_row, robot_col] = 2  # 2 pour le robot
+    grid_location[robot_row, robot_col] = 2  # 2 for the robot
 
-    # Afficher la matrice de grille
-    print("Matrice de grille (1 indique une cellule occupée, 0 indique une cellule libre) :")
+    # Display the grid matrix
+    print("Grid matrix (1 indicates an occupied cell, 0 indicates a free cell):")
     print(grid_location)
 
-    print("Chemin le plus court:", path)  # y,x
-    print("Points de changement de direction:", directions)  # y,x
+    print("Shortest path:", path)  # y,x
+    print("Direction change points:", directions)  # y,x
 
     print(robot_center)
     print(center_cube)
 
-
-    # Convertir les directions en coordonnées cartésiennes
+    # Convert directions to Cartesian coordinates
     cartesian_directions = [grid_to_cartesian(point, cell_width, cell_height) for point in directions]
     print(cartesian_directions)
 
     robotToTarget(robot_center, center_cube, cartesian_directions, map)
 
 
-
-
 if __name__ == '__main__':
+    # Uncomment and specify the path to your image if not using webcam
     # image = cv2.imread('data/map/IMG_0701.jpg')
 
-    # Récupération ce la video
+    # Capture video stream
     cap = cv2.VideoCapture(1)
 
-    i=0
+    i = 0
     while True:
         ret, image = cap.read()
-        i=i+1
-        if i==20:
+        i = i + 1
+        if i == 20:
             break
 
     main(image)
-
-
-
