@@ -1,18 +1,3 @@
-# computer-vision
-
-Entrainer le modèle avec Google collaborator
-
-
-last matrix et dist : 
-[[5.62345621e+03 0.00000000e+00 9.78581803e+02]
- [0.00000000e+00 3.87971890e+03 5.36279478e+02]
- [0.00000000e+00 0.00000000e+00 1.00000000e+00]]
-
-
-[[ 4.01221509e+00 -1.56265665e+01  5.65255582e-01  6.14085285e-02
-  -3.62514703e+02]]
-
-
 # Projet de Robot Logistique
 
 Ce projet vise à développer un système robotique autonome capable de localiser et transporter des objets spécifiques vers des zones prédéfinies sur une carte.
@@ -66,7 +51,7 @@ Assurez-vous que votre caméra est correctement calibrée pour minimiser les dis
 - La communication avec l'esp8266 ce fait via le protocole HTTP
 - [Televerser le code sur esp8266](ESP8266/robotExecution.ino)
 
-7. Lancez main.py
+  7. Lancez main.py
 
 # Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
