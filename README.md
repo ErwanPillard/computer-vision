@@ -1,101 +1,102 @@
-# Projet de Robot Logistique
+# Logistics Robot Project
 
-Ce projet vise à développer un système robotique autonome capable de localiser et transporter des objets spécifiques vers des zones prédéfinies sur une carte.
+This project aims to develop an autonomous robotic system capable of locating and transporting specific objects to predefined areas on a map.
 
-Enjeu : réussir à traiter les données en temps réel
+Challenge: Succeeding in processing real-time data.
 
 ## Installation
 
-### Prérequis
+### Prerequisites
 
-- [Entraînement du modèle YOLOv8 avec Google Colaboratory](#entraînement-du-modèle-yolov8-avec-google-colaboratory)
+- [Training YOLOv8 Model with Google Colaboratory](#training-yolov8-model-with-google-colaboratory)
 - Python 3.9
-- Bibliothèques Python nécessaires (numpy, requests, networkx, OpenCV 4.5.4.60)
-- ESP8266 avec [configuration spécifique]
+- Required Python libraries (numpy, requests, networkx, OpenCV 4.5.4.60)
+- ESP8266 with [specific configuration]
 
-### Installation des Dépendances
+### Installing Dependencies
 
-1. Clonez ce repository :
+1. Clone this repository:
 
    ```bash
-   git clone https://github.com/votre-utilisateur/votre-projet.git
-   cd votre-projet
+   git clone https://github.com/your-username/your-project.git
+   cd your-project
+
    
-2. Installez les dépendances Python :
+2. Install Python dependencies :
     ```bash
    pip install -r requirements.txt
 
-3. Créer un fichier "Model"
-   - Importez votre modèle de reconnaissance (nommez-le "best.pt").
-   - Pour tester que le modèle marche lancez le script modelDetectionTest.py
+3. Create a "Model" file
+   - Import your recognition model (name it "best.pt").
+   - To test the model, run the script modelDetectionTest.py:
     ```bash
    python Test/modelDetectionTest.py
 
-4. Création de la map
-![Texte alternatif](img/detected_cube.jpg)
-Taille : 1m50x1m
+4. Map Creation
+![Alternate Text](img/detected_cube.jpg)
+Size: 1.50m x 1m
 
 
-5. Calibration de la caméra
+5. Camera Calibration
 
-Assurez-vous que votre caméra est correctement calibrée pour minimiser les distorsions et améliorer la précision de la détection des marqueurs ArUco.
-- Imprimez un chessboard 7x5
-- Placez le chessboard dans différentes positions et orientations (Calibration/getImages.py)
-- Lancer le script de calibration
+Ensure your camera is properly calibrated to minimize distortions and improve the accuracy of ArUco marker detection.
+- Print a 7x5 chessboard
+- Place the chessboard in various positions and orientations (Calibration/getImages.py)
+- Run the calibration script
     ```bash
        python Calibration/calibration.py
-- Exporter les résultats dans Perception/mapDetectionFromIMG/mapDetection
+- Export the results to Perception/mapDetectionFromIMG/mapDetection
 
-6. Initialisation ESP8266
+6. ESP8266 Initialization
 
-- La communication avec l'esp8266 ce fait via le protocole HTTP
-- [Televerser le code sur esp8266](ESP8266/robotExecution.ino)
+- Communication with the ESP8266 is done via the HTTP protocol.
+- [Upload the code to ESP8266](ESP8266/robotExecution.ino)
 
-  7. Lancez main.py
+7. Launch main.py
 
-# Entraînement du Modèle YOLOv8 avec Google Colaboratory
+# Training the YOLOv8 Model with Google Colaboratory
 
-## 1. Récupération des données pour entraîner le modèle
+## 1. Retrieving data for model training
 
-- Prendre plusieurs photos (100 à 200) sous différents angles de vue. Vous pouvez utiliser le script `takePhoto.py` :
+- Take several photos (100 to 200) from different angles. You can use the `takePhoto.py` script:
 
   ```bash
   python takePhoto.py
 
-## 2. Annotation des images sur roboflow
 
-  - Rendez-vous sur : https://app.roboflow.com/
-  - Cliquez sur : "New Project"
-  - Nommez votre projet
-  - Créez une classe (exemple : "cube")
-  - Dans la section "Upload Data", récupérez vos photos précédemment prises
-  - Ensuite, annotez chaque image (délimitez votre/vos objet(s) présent(s) sur les photos)
-  - Pour plus de précision, prenez quelques photos sans objets et ne les annotez pas
-  - Ensuite, dans "Generate", générez un dataset
-  - Laissez le "Train Split" à 70/20/10
-  - Prétraitement en fonction de la précision souhaitée (facultatif)
-  - Puis créez le dataset et l'exportez
+## 2. Annotating images on Roboflow
 
-## 3. Entrainement du modèle Yolov8
- 
-   - Téléchargez le notebook : https://github.com/roboflow/notebooks/blob/main/notebooks/train-yolov8-object-detection-on-custom-dataset.ipynb
-   - Rendez-vous sur Google Colaboratory : https://colab.research.google.com/
-   - Importez le notebook
-   - Connecter le GPU T4
-   - Suivez les étapes du notebook en veillant à utiliser le modèle yolov8n.pt (le plus léger)
-   - Une fois le modèle entraîné, téléchargez model.pt
+- Go to: https://app.roboflow.com/
+- Click on: "New Project"
+- Name your project
+- Create a class (e.g., "cube")
+- In the "Upload Data" section, upload your previously taken photos
+- Annotate each image (outline your object(s) present in the photos)
+- For better accuracy, take some photos without objects and do not annotate them
+- Then, in "Generate", generate a dataset
+- Leave the "Train Split" at 70/20/10
+- Preprocess based on desired accuracy (optional)
+- Create and export the dataset
 
-On peut maintenant détecter notre object en temps réel via notre webcam
+## 3. Training the YOLOv8 model
 
+- Download the notebook: https://github.com/roboflow/notebooks/blob/main/notebooks/train-yolov8-object-detection-on-custom-dataset.ipynb
+- Go to Google Colaboratory: https://colab.research.google.com/
+- Import the notebook
+- Connect to the T4 GPU
+- Follow the steps in the notebook, ensuring to use the yolov8n.pt model (the lightest one)
+- Once the model is trained, download model.pt
 
-# Test et résultat
-- Test du software (chaque photos représente les étapes du graphe astar)
-- Ligne rouge représente un obstacle (fictif ici)
-![Texte alternatif](img/test1.png)
-![Texte alternatif](img/test2.png)
-![Texte alternatif](img/test3.png)
-![Texte alternatif](img/test4.png)
-![Texte alternatif](img/test5.png)
+Now, you can detect your object in real-time using your webcam
 
-- À améliorer : 
-Moteur du robot ne fonctionne pas en AC donc pas de variation de vitesse (trop rapide pour avoir un résultat en temps réel)
+# Testing and Results
+- Software testing (each photo represents steps of the A* graph)
+- Red line represents an obstacle (fictional here)
+![Alternate Text](img/test1.png)
+![Alternate Text](img/test2.png)
+![Alternate Text](img/test3.png)
+![Alternate Text](img/test4.png)
+![Alternate Text](img/test5.png)
+
+- To improve:
+The robot's motor does not work in AC, so there is no speed variation (too fast to achieve real-time results).
