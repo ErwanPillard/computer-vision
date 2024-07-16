@@ -4,8 +4,8 @@ import time
 
 def take_photo():
     # Vérifie si le dossier "photos" existe, sinon le crée
-    if not os.path.exists('photos'):
-        os.makedirs('photos')
+    if not os.path.exists('draft/photos'):
+        os.makedirs('draft/photos')
 
     # Ouvre la webcam
     cap = cv2.VideoCapture(0)
@@ -29,8 +29,7 @@ def take_photo():
         cv2.imshow('frame', frame)
 
         # Attend 1 seconde avant de prendre la prochaine photo
-        time.sleep(0.5)
-
+        time.sleep(1)
 
         # Vérifie si l'utilisateur a appuyé sur la touche 'q' pour quitter
         if cv2.waitKey(1) & 0xFF == ord('q'):

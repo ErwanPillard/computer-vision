@@ -17,6 +17,8 @@ last matrix et dist :
 
 Ce projet vise à développer un système robotique autonome capable de localiser et transporter des objets spécifiques vers des zones prédéfinies sur une carte.
 
+Enjeu : réussir à traiter les données en temps réel
+
 ## Installation
 
 ### Prérequis
@@ -38,12 +40,38 @@ Ce projet vise à développer un système robotique autonome capable de localise
     ```bash
    pip install -r requirements.txt
 
+# Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
-## Entraînement du Modèle YOLOv8 avec Google Colaboratory
+## 1. Récupération des données pour entraîner le modèle
 
-Expliquez ici les étapes pour préparer et entraîner votre modèle YOLOv8 en utilisant Google Colaboratory.
+- Prendre plusieurs photos (100 à 200) sous différents angles de vue. Vous pouvez utiliser le script `takePhoto.py` :
+
+  ```bash
+  python takePhoto.py
 
 
+## 2. Annotation des images sur roboflow
 
+  - Rendez-vous sur : https://app.roboflow.com/
+  - Cliquez sur : "New Project"
+  - Nommez votre projet
+  - Créez une classe (exemple : "cube")
+  - Dans la section "Upload Data", récupérez vos photos précédemment prises
+  - Ensuite, annotez chaque image (délimitez votre/vos objet(s) présent(s) sur les photos)
+  - Pour plus de précision, prenez quelques photos sans objets et ne les annotez pas
+  - Ensuite, dans "Generate", générez un dataset
+  - Laissez le "Train Split" à 70/20/10
+  - Prétraitement en fonction de la précision souhaitée (facultatif)
+  - Puis créez le dataset et l'exportez
 
+## 3. Entrainement du modèle Yolov8
+ 
+   - Téléchargez le notebook : https://github.com/roboflow/notebooks/blob/main/notebooks/train-yolov8-object-detection-on-custom-dataset.ipynb
+   - Rendez-vous sur Google Colaboratory : https://colab.research.google.com/
+   - Importez le notebook
+   - Connecter le GPU T4
+   - Suivez les étapes du notebook en veillant à utiliser le modèle yolov8n.pt (le plus léger)
+   - Une fois le modèle entraîné, téléchargez model.pt
+
+On peut maintenant détecter notre object en temps réel via notre webcam
 
