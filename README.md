@@ -87,3 +87,15 @@ Assurez-vous que votre caméra est correctement calibrée pour minimiser les dis
 
 On peut maintenant détecter notre object en temps réel via notre webcam
 
+
+# Test et résultat
+- Test du software (chaque photos représente les étapes du graphe astar)
+- Ligne rouge représente un obstacle (fictif ici)
+![Texte alternatif](img/test1.png)
+![Texte alternatif](img/test2.png)
+![Texte alternatif](img/test3.png)
+![Texte alternatif](img/test4.png)
+![Texte alternatif](img/test5.png)
+
+- À améliorer : 
+Moteur du robot ne fonctionne pas en AC donc pas de variation de vitesse (trop rapide pour avoir un résultat en temps réel)
