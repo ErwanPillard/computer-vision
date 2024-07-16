@@ -40,6 +40,9 @@ Enjeu : réussir à traiter les données en temps réel
     ```bash
    pip install -r requirements.txt
 
+
+
+
 # Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
 ## 1. Récupération des données pour entraîner le modèle
