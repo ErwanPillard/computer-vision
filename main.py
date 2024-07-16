@@ -11,29 +11,21 @@ image_width = 1500
 image_height = 1000
 
 def main(image):
-    #Récupération ce la video
-    #cap = cv2.VideoCapture(0)
-
-    #cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    #cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-
-
-    #ret, image = cap.read()
 
     # Redimensionner l'image pour une résolution plus gérable (par exemple, 1024x768)
-    scale_percent = 80  # pourcentage de réduction
-    width = int(image.shape[1] * scale_percent / 100)
-    height = int(image.shape[0] * scale_percent / 100)
-    dim = (width, height)
+    #scale_percent = 80  # pourcentage de réduction
+    #width = int(image.shape[1] * scale_percent / 100)
+    #height = int(image.shape[0] * scale_percent / 100)
+    #dim = (width, height)
 
     # Redimensionner l'image
-    resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+    #resized_image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
 
     # Detection de la map
-    map = mapDetection(resized_image)
+    map = mapDetection(image)
 
     #Sélection de la region of interest
-    roi = get_roi(map, resized_image, image_width, image_height)
+    roi = get_roi(map, image, image_width, image_height)
 
     # Detection Objet
     center_cube, box_coordinates, roi = cube_detection(roi)
@@ -46,12 +38,12 @@ def main(image):
     # Detection Robot
     robot_center, roi = detect_robot_center(roi)
 
-    #Recuération de la map modelisé en fonction des object/obstacles presents
-    grid_location, grid_obstacle, cube_row, cube_col, robot_row, robot_col = matrice(box_coordinates, center_cube, robot_center, grid_rows, grid_cols, cell_width, cell_height)
-
-    cv2.imshow('Gridded ROI', resized_image)
+    cv2.imshow('Gridded ROI', roi)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+
+    #Recuération de la map modelisé en fonction des object/obstacles presents
+    grid_location, grid_obstacle, cube_row, cube_col, robot_row, robot_col = matrice(box_coordinates, center_cube, robot_center, grid_rows, grid_cols, cell_width, cell_height)
 
     path, directions = astar(grid_location, (robot_row, robot_col), (cube_row, cube_col))
 
@@ -73,14 +65,25 @@ def main(image):
     cartesian_directions = [grid_to_cartesian(point, cell_width, cell_height) for point in directions]
     print(cartesian_directions)
 
-    cv2.imshow('Gridded ROI', roi)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    robotToTarget(robot_center, center_cube, cartesian_directions, map)
 
-    robotToTarget(roi, robot_center, center_cube, cartesian_directions)
+
 
 
 if __name__ == '__main__':
-    image = cv2.imread('data/map/IMG_0701.jpg')
+    # image = cv2.imread('data/map/IMG_0701.jpg')
+
+    # Récupération ce la video
+    cap = cv2.VideoCapture(1)
+
+    i=0
+    while True:
+        ret, image = cap.read()
+        i=i+1
+        if i==20:
+            break
 
     main(image)
+
+
+

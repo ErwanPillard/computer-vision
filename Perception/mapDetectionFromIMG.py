@@ -23,8 +23,15 @@ def detect_aruco_markers(frame, aruco_dict_type, matrix_coefficients, distortion
 
 def mapDetection(frame):
     # Camera calibration parameters
-    intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
-    distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
+    intrinsic_camera = np.array([
+        [1.05327935e+04, 0.00000000e+00, 9.49629087e+02],
+        [0.00000000e+00, 6.30700850e+03, 5.43852752e+02],
+        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+    ])
+
+    distortion = np.array([
+        [-0.45353514, 186.65504933, 0.39744416, -0.35031288, 1.01085776]
+    ])
 
     # ArUco dictionary
     arucoDict = cv2.aruco.DICT_4X4_1000

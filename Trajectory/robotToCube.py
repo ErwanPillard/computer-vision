@@ -2,30 +2,43 @@
 import cv2
 import numpy as np
 import requests
+from Trajectory.matrice import get_roi
 
 # Camera calibration parameters
-intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
-distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
+intrinsic_camera = np.array([
+        [1.05327935e+04, 0.00000000e+00, 9.49629087e+02],
+        [0.00000000e+00, 6.30700850e+03, 5.43852752e+02],
+        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+])
 
-def robotToTarget(frame, start, goal, directions):
+distortion = np.array([
+    [-0.45353514, 186.65504933, 0.39744416, -0.35031288, 1.01085776]
+])
+def robotToTarget(start, goal, directions, map1):
     current_position = start
 
     for target in directions:
-        move_robot_to_target(frame, current_position, target)
+        move_robot_to_target(current_position, target, map1)
         current_position = target
 
-    move_robot_to_target(frame, current_position, goal)
+    move_robot_to_target(current_position, goal, map1)
 
 
-def move_robot_to_target(frame, start, target):
+def move_robot_to_target(start, target, map1):
     reached_target = False
 
+    # Récupération ce la video
+    cap = cv2.VideoCapture(1)
+
     while not reached_target:
+
+        ret, image = cap.read()
+        frame = get_roi(map1, image, 1500, 1000)
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
         parameters = cv2.aruco.DetectorParameters_create()
 
-        corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters,
+        corners, ids, _ = cv2.aruco.detectMarkers(frame, aruco_dict, parameters=parameters,
                                                   cameraMatrix=intrinsic_camera,
                                                   distCoeff=distortion)
 
@@ -108,8 +121,8 @@ def move_robot_to_target(frame, start, target):
 def send_data(angle, distance):
 
     #url = 'http://172.20.10.2/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
-    url = 'http://192.168.1.17/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
+    url = 'http://192.168.1.15/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
 
     # Send the distance and angle values to the ESP8266 server
-    response = requests.get(url, params={'distance': distance, 'angle': angle})
-    print(response.text)  # Print the response from the ESP8266 server
+    response = requests.get(url, params={'distance': distance, 'angle': angle, 'vitesse_r': 160, 'vitesse': 251})
+    #qprint(response.text)  # Print the response from the ESP8266 server

@@ -23,8 +23,16 @@ def detect_aruco_markers(frame, aruco_dict_type, matrix_coefficients, distortion
 
 def mapDetection(frame):
     # Camera calibration parameters
-    intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
-    distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
+    intrinsic_camera = np.array([
+        [1.05327935e+04, 0.00000000e+00, 9.49629087e+02],
+        [0.00000000e+00, 6.30700850e+03, 5.43852752e+02],
+        [0.00000000e+00, 0.00000000e+00, 1.00000000e+00]
+    ])
+
+    distortion = np.array([
+        [-0.45353514, 186.65504933, 0.39744416, -0.35031288, 1.01085776]
+    ])
+
     # ArUco dictionary
     arucoDict = cv2.aruco.DICT_4X4_1000
     aruco_dict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_1000)
@@ -46,11 +54,11 @@ def mapDetection(frame):
             # Convert corner coordinates to integers
             marker_corners_int = np.int32(marker_corners)
             # Draw marker ID and corner coordinates on the frame
-            cv2.putText(frame, f"ID: {marker_id}", (marker_corners_int[0][0], marker_corners_int[0][1] - 10),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
-            cv2.putText(frame, f"({marker_corners_int[0][0]}, {marker_corners_int[0][1]})",
-                        (marker_corners_int[0][0], marker_corners_int[0][1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                        (0, 0, 0), 2)
+            # cv2.putText(frame, f"ID: {marker_id}", (marker_corners_int[0][0], marker_corners_int[0][1] - 10),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            # cv2.putText(frame, f"({marker_corners_int[0][0]}, {marker_corners_int[0][1]})",
+            #             (marker_corners_int[0][0], marker_corners_int[0][1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+            #             (0, 0, 0), 2)
             # Determine specific corners based on ArUco marker ID
             if marker_id == 1:
                 # Bottom left corner
@@ -83,7 +91,9 @@ def mapDetection(frame):
         return ZONE_POLYGON
 
 
-    #cv2.imshow('Detected Arucos', frame)
+    cv2.imshow('Detected Arucos', frame)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
     # Save the frame and exit
     #cv2.imwrite('webcam_frame.jpg', frame)

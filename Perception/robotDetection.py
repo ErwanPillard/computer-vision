@@ -10,7 +10,7 @@ def detect_robot_center(frame, aruco_dict_type=cv2.aruco.DICT_4X4_100, target_id
     parameters = cv2.aruco.DetectorParameters_create()
 
     # Détection des marqueurs
-    corners, ids, _ = cv2.aruco.detectMarkers(gray, aruco_dict, parameters=parameters)
+    corners, ids, _ = cv2.aruco.detectMarkers(frame, aruco_dict, parameters=parameters)
 
     center_coordinates = None
     annotated_frame = frame.copy()
@@ -26,6 +26,7 @@ def detect_robot_center(frame, aruco_dict_type=cv2.aruco.DICT_4X4_100, target_id
 
                 # Annoter l'image
                 #cv2.circle(annotated_frame, center_coordinates, 10, (0, 255, 0), -1)
+                print("ROBOT DETECTED")
                 break
 
     return center_coordinates, annotated_frame
