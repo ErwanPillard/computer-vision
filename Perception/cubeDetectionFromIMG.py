@@ -4,13 +4,7 @@ import numpy as np
 from ultralytics import YOLO
 import supervision as sv
 
-# Camera calibration parameters
-intrinsic_camera = np.array(((1281.57894, 0, 457.638346), (0, 1262.76271, 260.388263), (0, 0, 1)))
-distortion = np.array((0.12431658, -0.55314019, 0, 0, 0))
-
 arucoDict = cv2.aruco.DICT_4X4_1000
-
-
 
 def get_cube_center(results):
     for i in range(len(results.boxes.xyxy)):

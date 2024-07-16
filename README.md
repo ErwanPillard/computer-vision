@@ -51,12 +51,22 @@ Enjeu : réussir à traiter les données en temps réel
 Taille : 1m50x1m
 
 
-5. Initialisation ESP8266
+5. Calibration de la caméra
+
+Assurez-vous que votre caméra est correctement calibrée pour minimiser les distorsions et améliorer la précision de la détection des marqueurs ArUco.
+- Imprimez un chessboard 7x5
+- Placez le chessboard dans différentes positions et orientations (Calibration/getImages.py)
+- Lancer le script de calibration
+    ```bash
+       python Calibration/calibration.py
+- Exporter les résultats dans Perception/mapDetectionFromIMG/mapDetection
+
+6. Initialisation ESP8266
 
 - La communication avec l'esp8266 ce fait via le protocole HTTP
 - [Televerser le code sur esp8266](ESP8266/robotExecution.ino)
 
-6. Lancez main.py
+7. Lancez main.py
 
 # Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
