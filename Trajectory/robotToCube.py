@@ -104,7 +104,7 @@ def move_robot_to_target(start, target, map1):
             cv2.aruco.drawAxis(frame, intrinsic_camera, distortion, rvec_robot, tvec_robot, 0.01)
 
             # Envoyer les données pour contrôler le robot (exemple : rotation et distance)
-            #send_data(signed_angle_deg, distance)
+            send_data(signed_angle_deg, distance)
 
             # Mettre à jour la position actuelle du robot
             current_position = robot_center
@@ -120,9 +120,8 @@ def move_robot_to_target(start, target, map1):
 
 def send_data(angle, distance):
 
-    #url = 'http://172.20.10.2/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
     url = 'http://192.168.1.15/data'  # Replace <ESP8266-IP-ADDRESS> with the IP address of your ESP8266
 
     # Send the distance and angle values to the ESP8266 server
     response = requests.get(url, params={'distance': distance, 'angle': angle, 'vitesse_r': 160, 'vitesse': 251})
-    #qprint(response.text)  # Print the response from the ESP8266 server
+    #print(response.text)  # Print the response from the ESP8266 server

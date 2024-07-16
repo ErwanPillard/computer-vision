@@ -1,11 +1,10 @@
 import cv2
-import numpy as np
 from Perception.mapDetectionFromIMG import mapDetection
 from Trajectory.matrice import matrice, get_roi, grid_to_cartesian
 from Perception.cubeDetectionFromIMG import cube_detection
 from Perception.robotDetection import detect_robot_center
 from Trajectory.robotToCube import robotToTarget
-from Astar import astar
+from Trajectory.Astar import astar
 
 image_width = 1500
 image_height = 1000

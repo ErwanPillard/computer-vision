@@ -54,7 +54,9 @@ Taille : 1m50x1m
 5. Initialisation ESP8266
 
 - La communication avec l'esp8266 ce fait via le protocole HTTP
-- [Televerser le code sur esp8266](robotExecution.ino)
+- [Televerser le code sur esp8266](ESP8266/robotExecution.ino)
+
+6. Lancez main.py
 
 # Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
