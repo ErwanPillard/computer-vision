@@ -47,7 +47,7 @@ def setup_camera():
 def cube_detection_inZone(ZONE_POLYGON):
     cap, args = setup_camera()
 
-    model = YOLO("../Model/best_2.pt")
+    model = YOLO("../Model/best.pt")
     tracker = sv.ByteTrack()
 
     #Type of annotator
@@ -103,7 +103,7 @@ def cube_detection_inZone(ZONE_POLYGON):
 def robot_object():
     cap, args = setup_camera()
 
-    model = YOLO("../Model/best_2.pt")
+    model = YOLO("../Model/best.pt")
 
     # Type of annotator
     box_annotator = sv.BoundingBoxAnnotator()

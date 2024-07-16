@@ -8,7 +8,7 @@ arucoDict = cv2.aruco.DICT_4X4_1000
 def main():
     cap = cv2.VideoCapture(0)
 
-    model = YOLO("../Model/best_2.pt")
+    model = YOLO("../Model/best.pt")
     #Type of annotator
     box_annotator = sv.BoundingBoxAnnotator()
     label_annotator = sv.LabelAnnotator()

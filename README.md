@@ -40,8 +40,21 @@ Enjeu : réussir à traiter les données en temps réel
     ```bash
    pip install -r requirements.txt
 
+3. Créer un fichier "Model"
+   - Importez votre modèle de reconnaissance (nommez-le "best.pt").
+   - Pour tester que le modèle marche lancez le script modelDetectionTest.py
+    ```bash
+   python Test/modelDetectionTest.py
+
+4. Création de la map
+![Texte alternatif](img/detected_cube.jpg)
+Taille : 1m50x1m
 
 
+5. Initialisation ESP8266
+
+- La communication avec l'esp8266 ce fait via le protocole HTTP
+- [Televerser le code sur esp8266](robotExecution.ino)
 
 # Entraînement du Modèle YOLOv8 avec Google Colaboratory
 
@@ -51,7 +64,6 @@ Enjeu : réussir à traiter les données en temps réel
 
   ```bash
   python takePhoto.py
-
 
 ## 2. Annotation des images sur roboflow
 

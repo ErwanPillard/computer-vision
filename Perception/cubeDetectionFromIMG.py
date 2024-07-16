@@ -23,7 +23,7 @@ def get_cube_center(results):
 
 def cube_detection_inZone(ZONE_POLYGON, frame):
 
-    model = YOLO("../Model/best_2.pt")
+    model = YOLO("../Model/best.pt")
     tracker = sv.ByteTrack()
 
     # Type of annotator
@@ -89,7 +89,7 @@ def get_boxes(results):
 
 def cube_detection(frame):
 
-    model = YOLO("Model/best_2.pt")
+    model = YOLO("Model/best.pt")
 
     # Type of annotator
     box_annotator = sv.BoundingBoxAnnotator()
